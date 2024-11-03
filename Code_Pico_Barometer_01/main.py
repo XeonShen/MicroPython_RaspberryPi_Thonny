@@ -1,10 +1,11 @@
-############################################        
-########## waveshare screen drive ##########
-############################################
-
-from machine import Pin, SPI
+from machine import ADC, Pin, SPI
 import framebuf
+import time
 import utime
+
+########################################################        
+################ waveshare screen drive ################
+########################################################
 
 WF_PARTIAL_2IN13_V3= [
     0x0,0x40,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
@@ -590,23 +591,36 @@ class EPD_2in13_V3_Landscape(framebuf.FrameBuffer):
         self.send_data(0x01)
         self.delay_ms(100)
               
-################################################        
-########## measure battery percentage ##########
-################################################
-
-from machine import ADC
-import time
+############################################################        
+################ measure battery percentage ################
+############################################################
 
 voltageInput = ADC(29)
 voltageConversionFactor = 3 * 3.3 / 65535
 voltageFullBattery = 4.2
 voltageEmptyBattery = 3.3
 
-voltage = voltageInput.read_u16() * voltageConversionFactor * 21
-batteryPercentage = 100 * ((voltage - voltageEmptyBattery) / (voltageFullBattery - voltageEmptyBattery))
-if batteryPercentage > 100:
-    batteryPercentage = 100
-elif batteryPercentage < 0:
-    batteryPercentage = 0
+def ReadBatteryPercentage():
+    voltage = voltageInput.read_u16() * voltageConversionFactor * 21
+    batteryPercentage = 100 * ((voltage - voltageEmptyBattery) / (voltageFullBattery - voltageEmptyBattery))
+    if batteryPercentage > 100:
+        batteryPercentage = 100
+    elif batteryPercentage < 0:
+        batteryPercentage = 0
+    return round(batteryPercentage)
 
-print(round(batteryPercentage))
+########################################################        
+################ read temperature sensor ###############
+########################################################
+
+temperatureInput = ADC(4)
+temperatureConversionFactor = 3.3 / 65535
+
+def ReadTemperature():
+    temperatureInVoltage = temperatureInput.read_u16() * temperatureConversionFactor
+    temperature = 27 - (temperatureInVoltage - 0.706) / 0.001721
+    return round(temperature, 1)
+    
+################################################       
+################ set date & time ###############
+################################################
