@@ -600,7 +600,7 @@ voltageConversionFactor = 3 * 3.3 / 65535
 voltageFullBattery = 4.2
 voltageEmptyBattery = 3.3
 
-def ReadBatteryPercentage():
+def GetBatteryPercentage():
     voltage = voltageInput.read_u16() * voltageConversionFactor * 21
     batteryPercentage = 100 * ((voltage - voltageEmptyBattery) / (voltageFullBattery - voltageEmptyBattery))
     if batteryPercentage > 100:
@@ -616,11 +616,30 @@ def ReadBatteryPercentage():
 temperatureInput = ADC(4)
 temperatureConversionFactor = 3.3 / 65535
 
-def ReadTemperature():
+def GetTemperature():
     temperatureInVoltage = temperatureInput.read_u16() * temperatureConversionFactor
     temperature = 27 - (temperatureInVoltage - 0.706) / 0.001721
     return round(temperature, 1)
     
-################################################       
-################ set date & time ###############
-################################################
+##################################################      
+################ set time manually ###############
+##################################################
+
+initialHour = 0
+initialMinute = 0
+initialSecond = 0
+initialTimeStamp = time.time()
+
+def SetTime(hour, minute, second):
+    global initialHour, initialMinute, initialSecond
+    initialHour = hour
+    initialMinute = minute
+    initialSecond = second
+
+def GetTime():
+    elapsedSeconds = time.time() - initialTimeStamp
+    totalSeconds = initialHour * 3600 + initialMinute * 60 + initialSecond + int(elapsedSeconds)
+    currentHours = (totalSeconds // 3600) % 24
+    currentMinutes = (totalSeconds % 3600) // 60
+    currentSeconds = totalSeconds % 60
+    return f"{currentHours:02}:{currentMinutes:02}:{currentSeconds:02}"
