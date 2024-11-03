@@ -595,13 +595,13 @@ class EPD_2in13_V3_Landscape(framebuf.FrameBuffer):
 ################ measure battery percentage ################
 ############################################################
 
-voltageInput = ADC(29)
+voltageInput = ADC(Pin(29))
 voltageConversionFactor = 3 * 3.3 / 65535
 voltageFullBattery = 4.2
 voltageEmptyBattery = 3.3
 
 def GetBatteryPercentage():
-    voltage = voltageInput.read_u16() * voltageConversionFactor * 21
+    voltage = voltageInput.read_u16() * voltageConversionFactor
     batteryPercentage = 100 * ((voltage - voltageEmptyBattery) / (voltageFullBattery - voltageEmptyBattery))
     if batteryPercentage > 100:
         batteryPercentage = 100
