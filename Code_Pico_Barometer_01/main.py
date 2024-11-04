@@ -692,15 +692,13 @@ epd.rect(50 + 180, 26, 10, 80, 0x00)
 epd.line(10 + 180, 26, 59 + 180, 105, 0x00)
 epd.line(10 + 180, 105, 59 + 180, 26, 0x00)
 
-epd.display(epd.buffer)
-epd.delay_ms(2000)
+# epd.display(epd.buffer)
+# epd.delay_ms(2000)
 
 def DrawNumberOneInSlot(slot):
     epd.fill_rect(30 + (slot - 1) * 60, 26, 10, 80, 0x00)
     epd.fill_rect(10 + (slot - 1) * 60, 26, 20, 10, 0x00)
     epd.fill_rect(10 + (slot - 1) * 60, 96, 50, 10, 0x00)
-    epd.display(epd.buffer)
-    epd.delay_ms(2000)
     
 def DrawNumberTwoInSlot(slot):
     epd.fill_rect(10 + (slot - 1) * 60, 26, 50, 10, 0x00)
@@ -708,8 +706,63 @@ def DrawNumberTwoInSlot(slot):
     epd.fill_rect(10 + (slot - 1) * 60, 96, 50, 10, 0x00)
     epd.fill_rect(10 + (slot - 1) * 60, 70, 10, 26, 0x00)
     epd.fill_rect(50 + (slot - 1) * 60, 36, 10, 24, 0x00)
-    epd.display(epd.buffer)
-    epd.delay_ms(2000)
     
+def DrawNumberThreeInSlot(slot):
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 60, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 96, 50, 10, 0x00)
+    epd.fill_rect(50 + (slot - 1) * 60, 26, 10, 80, 0x00)
+    
+def DrawNumberFourInSlot(slot):
+    epd.fill_rect(10 + (slot - 1) * 60, 60, 50, 10, 0x00)
+    epd.fill_rect(30 + (slot - 1) * 60, 26, 10, 80, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 10, 34, 0x00)
+    
+def DrawNumberFiveInSlot(slot):
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 60, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 96, 50, 10, 0x00)
+    epd.fill_rect(50 + (slot - 1) * 60, 70, 10, 26, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 36, 10, 24, 0x00)
+    
+def DrawNumberSixInSlot(slot):
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 60, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 96, 50, 10, 0x00)
+    epd.fill_rect(50 + (slot - 1) * 60, 70, 10, 26, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 10, 80, 0x00)
+    
+def DrawNumberSevenInSlot(slot):
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 50, 10, 0x00)
+    epd.fill_rect(50 + (slot - 1) * 60, 26, 10, 80, 0x00)
+
+def DrawNumberEightInSlot(slot):
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 10, 80, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 60, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 96, 50, 10, 0x00)
+    epd.fill_rect(50 + (slot - 1) * 60, 26, 10, 80, 0x00)
+    
+def DrawNumberNineInSlot(slot):
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 60, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 96, 50, 10, 0x00)
+    epd.fill_rect(50 + (slot - 1) * 60, 26, 10, 80, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 36, 10, 24, 0x00)
+    
+def DrawNumberZeroInSlot(slot):
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 10, 80, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 96, 50, 10, 0x00)
+    epd.fill_rect(50 + (slot - 1) * 60, 26, 10, 80, 0x00)
+
+
+DrawNumberZeroInSlot(1)
 DrawNumberOneInSlot(2)
-DrawNumberTwoInSlot(1)
+DrawNumberZeroInSlot(3)
+DrawNumberFiveInSlot(4)
+
+
+epd.display(epd.buffer)
+epd.delay_ms(2000)
+
