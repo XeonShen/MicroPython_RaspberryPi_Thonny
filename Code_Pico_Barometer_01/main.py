@@ -3,9 +3,9 @@ import framebuf
 import time
 import utime
 
-########################################################        
-################ waveshare screen drive ################
-########################################################
+#########################################################        
+################ waveshare screen driver ################
+#########################################################
 
 WF_PARTIAL_2IN13_V3= [
     0x0,0x40,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,
@@ -595,7 +595,7 @@ class EPD_2in13_V3_Landscape(framebuf.FrameBuffer):
 ################ measure battery percentage ################
 ############################################################
 
-voltageInput = ADC(Pin(29))
+voltageInput = ADC(Pin(29)) # IMPORTANT! use ADC(Pin(29)) instead of ADC(29)
 voltageConversionFactor = 3 * 3.3 / 65535
 voltageFullBattery = 4.2
 voltageEmptyBattery = 3.3
@@ -643,3 +643,73 @@ def GetTime():
     currentMinutes = (totalSeconds % 3600) // 60
     currentSeconds = totalSeconds % 60
     return f"{currentHours:02}:{currentMinutes:02}:{currentSeconds:02}"
+
+#######################################################      
+################ display time on screen ###############
+#######################################################
+
+epd = EPD_2in13_V3_Landscape()
+epd.Clear()
+epd.fill(0xff)
+
+# draw 1st number slot on screen
+epd.rect(10, 26, 10, 80, 0x00)
+epd.rect(10, 26, 50, 10, 0x00)
+epd.rect(10, 60, 50, 10, 0x00)
+epd.rect(10, 96, 50, 10, 0x00)
+epd.rect(30, 26, 10, 80, 0x00)
+epd.rect(50, 26, 10, 80, 0x00)
+epd.line(10, 26, 59, 105, 0x00)
+epd.line(10, 105, 59, 26, 0x00)
+
+# draw 2nd number slot on screen
+epd.rect(10 + 60, 26, 10, 80, 0x00)
+epd.rect(10 + 60, 26, 50, 10, 0x00)
+epd.rect(10 + 60, 60, 50, 10, 0x00)
+epd.rect(10 + 60, 96, 50, 10, 0x00)
+epd.rect(30 + 60, 26, 10, 80, 0x00)
+epd.rect(50 + 60, 26, 10, 80, 0x00)
+epd.line(10 + 60, 26, 59 + 60, 105, 0x00)
+epd.line(10 + 60, 105, 59 + 60, 26, 0x00)
+
+# draw 3rd number slot on screen
+epd.rect(10 + 120, 26, 10, 80, 0x00)
+epd.rect(10 + 120, 26, 50, 10, 0x00)
+epd.rect(10 + 120, 60, 50, 10, 0x00)
+epd.rect(10 + 120, 96, 50, 10, 0x00)
+epd.rect(30 + 120, 26, 10, 80, 0x00)
+epd.rect(50 + 120, 26, 10, 80, 0x00)
+epd.line(10 + 120, 26, 59 + 120, 105, 0x00)
+epd.line(10 + 120, 105, 59 + 120, 26, 0x00)
+
+# draw 4th number slot on screen
+epd.rect(10 + 180, 26, 10, 80, 0x00)
+epd.rect(10 + 180, 26, 50, 10, 0x00)
+epd.rect(10 + 180, 60, 50, 10, 0x00)
+epd.rect(10 + 180, 96, 50, 10, 0x00)
+epd.rect(30 + 180, 26, 10, 80, 0x00)
+epd.rect(50 + 180, 26, 10, 80, 0x00)
+epd.line(10 + 180, 26, 59 + 180, 105, 0x00)
+epd.line(10 + 180, 105, 59 + 180, 26, 0x00)
+
+epd.display(epd.buffer)
+epd.delay_ms(2000)
+
+def DrawNumberOneInSlot(slot):
+    epd.fill_rect(30 + (slot - 1) * 60, 26, 10, 80, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 20, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 96, 50, 10, 0x00)
+    epd.display(epd.buffer)
+    epd.delay_ms(2000)
+    
+def DrawNumberTwoInSlot(slot):
+    epd.fill_rect(10 + (slot - 1) * 60, 26, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 60, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 96, 50, 10, 0x00)
+    epd.fill_rect(10 + (slot - 1) * 60, 70, 10, 26, 0x00)
+    epd.fill_rect(50 + (slot - 1) * 60, 36, 10, 24, 0x00)
+    epd.display(epd.buffer)
+    epd.delay_ms(2000)
+    
+DrawNumberOneInSlot(2)
+DrawNumberTwoInSlot(1)
