@@ -644,9 +644,9 @@ def GetTime():
     #currentSeconds = totalSeconds % 60
     return currentHours, currentMinutes
 
-#######################################################      
-################ display time on screen ###############
-#######################################################
+##########################################################      
+################ draw components on screen ###############
+##########################################################
 
 def DrawNumberSlot():
     # draw 1st number slot on screen
@@ -817,6 +817,33 @@ def DrawNumber(firstNum, secondNum, thirdNum, forthNum):
     draw() if draw else print("Invalid Number")
     draw = forthSlot.get(forthNum)
     draw() if draw else print("Invalid Number")
+    
+def DrawBatterySlot():
+    epd.rect(219, 10, 5, 8, 0x00)
+    epd.rect(224, 10, 5, 8, 0x00)
+    epd.rect(229, 10, 5, 8, 0x00)
+    epd.rect(234, 10, 5, 8, 0x00)
+    epd.rect(218, 9, 22, 10, 0x00)
+    epd.fill_rect(239, 11, 3, 6, 0x00)
+    
+def DrawBattery(number):
+    if number >= 75:
+        epd.fill_rect(219, 10, 5, 8, 0x00)
+        epd.fill_rect(224, 10, 5, 8, 0x00)
+        epd.fill_rect(229, 10, 5, 8, 0x00)
+        epd.fill_rect(234, 10, 5, 8, 0x00)
+    elif number >= 50 and number < 75:
+        epd.fill_rect(219, 10, 5, 8, 0x00)
+        epd.fill_rect(224, 10, 5, 8, 0x00)
+        epd.fill_rect(229, 10, 5, 8, 0x00)
+    elif number >= 25 and number < 50:
+        epd.fill_rect(219, 10, 5, 8, 0x00)
+        epd.fill_rect(224, 10, 5, 8, 0x00)
+    elif number >= 1 and number < 25:
+        epd.fill_rect(219, 10, 5, 8, 0x00)
+    
+def DrawBatteryPercentage(number):
+    epd.text(str(number) + "%", 185, 11, 0x00)
 
 ###########################################     
 ################ main logic ###############
@@ -838,16 +865,22 @@ while True:
     currentHourSecondNum = currentHour % 10
     currentMinuteFirstNum = currentMinute //10
     currentMinuteSecondNum = currentMinute % 10
-    # put things in buffer
+    # draw time components in buffer
     DrawNumberSlot()
     DrawNumber(currentHourFirstNum,currentHourSecondNum,currentMinuteFirstNum,currentMinuteSecondNum)
-    # display things in buffer
+    # get battery percentage
+    batteryPercentage = GetBatteryPercentage()
+    # draw battery components in buffer
+    DrawBatterySlot()
+    DrawBattery(batteryPercentage)
+    DrawBatteryPercentage(batteryPercentage)
+    # display all components in buffer
     epd.display(epd.buffer)
-    # put screen into sleep mode for 1min
+    # put screen into sleep mode for 180s
     epd.sleep()
-    time.sleep(60)
+    time.sleep(180)
     epd.init()
     # clean the screen
     screenRefreshTime += 1
-    epd.Clear() if screenRefreshTime % 60 == 0 else None
+    epd.Clear() if screenRefreshTime % 20 == 0 else None
     epd.fill(0xff)
