@@ -641,8 +641,8 @@ def GetTime():
     totalSeconds = initialHour * 3600 + initialMinute * 60 + initialSecond + int(elapsedSeconds)
     currentHours = (totalSeconds // 3600) % 24
     currentMinutes = (totalSeconds % 3600) // 60
-    currentSeconds = totalSeconds % 60
-    return f"{currentHours:02}:{currentMinutes:02}:{currentSeconds:02}"
+    #currentSeconds = totalSeconds % 60
+    return currentHours, currentMinutes
 
 #######################################################      
 ################ display time on screen ###############
@@ -826,8 +826,17 @@ epd = EPD_2in13_V3_Landscape()
 epd.Clear()
 epd.fill(0xff)
 
-DrawNumberSlot()
-DrawNumber(9,8,7,6)
+SetTime(14,25,0)
 
-epd.display(epd.buffer)
-epd.delay_ms(2000)
+while True:
+    currentHour, currentMinute = GetTime()
+    currentHourFirstNum = currentHour // 10
+    currentHourSecondNum = currentHour % 10
+    currentMinuteFirstNum = currentMinute //10
+    currentMinuteSecondNum = currentMinute % 10
+    
+    DrawNumberSlot()
+    DrawNumber(currentHourFirstNum,currentHourSecondNum,currentMinuteFirstNum,currentMinuteSecondNum)
+
+    epd.display(epd.buffer)
+    epd.delay_ms(60000)
