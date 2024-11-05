@@ -713,7 +713,7 @@ def DrawNumberThreeInSlot(slot):
 def DrawNumberFourInSlot(slot):
     xOffset = (slot - 1) * 60
     epd.fill_rect(10 + xOffset, 60, 50, 10, 0x00)
-    epd.fill_rect(30 + xOffset, 26, 10, 80, 0x00)
+    epd.fill_rect(50 + xOffset, 26, 10, 80, 0x00)
     epd.fill_rect(10 + xOffset, 26, 10, 34, 0x00)
     
 def DrawNumberFiveInSlot(slot):
@@ -822,21 +822,32 @@ def DrawNumber(firstNum, secondNum, thirdNum, forthNum):
 ################ main logic ###############
 ###########################################
 
+# initialize the screen
 epd = EPD_2in13_V3_Landscape()
 epd.Clear()
 epd.fill(0xff)
-
-SetTime(14,25,0)
+# set start time
+SetTime(16,26,0)
+# count screen refresh time
+screenRefreshTime = 0
 
 while True:
+    # get current time
     currentHour, currentMinute = GetTime()
     currentHourFirstNum = currentHour // 10
     currentHourSecondNum = currentHour % 10
     currentMinuteFirstNum = currentMinute //10
     currentMinuteSecondNum = currentMinute % 10
-    
+    # put things in buffer
     DrawNumberSlot()
     DrawNumber(currentHourFirstNum,currentHourSecondNum,currentMinuteFirstNum,currentMinuteSecondNum)
-
+    # display things in buffer
     epd.display(epd.buffer)
-    epd.delay_ms(60000)
+    # put screen into sleep mode for 1min
+    epd.sleep()
+    time.sleep(60)
+    epd.init()
+    # clean the screen
+    screenRefreshTime += 1
+    epd.Clear() if screenRefreshTime % 60 == 0 else None
+    epd.fill(0xff)
