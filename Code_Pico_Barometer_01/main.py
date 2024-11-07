@@ -591,9 +591,9 @@ class EPD_2in13_V3_Landscape(framebuf.FrameBuffer):
         self.send_data(0x01)
         self.delay_ms(100)
               
-############################################################        
-################ measure battery percentage ################
-############################################################
+###############################################################        
+################ battery measurement functions ################
+###############################################################
 
 voltageInput = ADC(Pin(29)) # IMPORTANT! use ADC(Pin(29)) instead of ADC(29)
 voltageConversionFactor = 3 * 3.3 / 65535
@@ -609,9 +609,17 @@ def GetBatteryPercentage():
         batteryPercentage = 0
     return round(batteryPercentage)
 
-########################################################        
-################ read temperature sensor ###############
-########################################################
+batteryChargingPin = Pin(24, Pin.IN)
+
+def GetBatteryChargingStatus():
+    if batteryChargingPin.value() == 1:
+        return True
+    else:
+        return False
+
+##################################################################
+################ temperature measurement functions ###############
+##################################################################
 
 temperatureInput = ADC(4)
 temperatureConversionFactor = 3.3 / 65535
@@ -621,9 +629,9 @@ def GetTemperature():
     temperature = 27 - (temperatureInVoltage - 0.706) / 0.001721
     return round(temperature, 1)
     
-##################################################      
-################ set time manually ###############
-##################################################
+########################################################      
+################ timer setter and getter ###############
+########################################################
 
 initialHour = 0
 initialMinute = 0
@@ -645,7 +653,7 @@ def GetTime():
     return currentHours, currentMinutes
 
 ##########################################################      
-################ draw components on screen ###############
+################ draw components in buffer ###############
 ##########################################################
 
 def DrawNumberSlot():
@@ -844,10 +852,14 @@ def DrawBattery(number):
     
 def DrawBatteryPercentage(number):
     epd.text(str(number) + "%", 185, 11, 0x00)
+    
+def DrawBatteryCharging(status):
+    if status:
+        epd.text("Charging", 94, 11, 0x00)
 
-###########################################     
-################ main logic ###############
-###########################################
+###################################################    
+################ program main logic ###############
+###################################################
 
 # initialize the screen
 epd = EPD_2in13_V3_Landscape()
@@ -868,17 +880,19 @@ while True:
     # draw time components in buffer
     DrawNumberSlot()
     DrawNumber(currentHourFirstNum,currentHourSecondNum,currentMinuteFirstNum,currentMinuteSecondNum)
-    # get battery percentage
+    # get battery status
     batteryPercentage = GetBatteryPercentage()
+    batteryCharging = GetBatteryChargingStatus()
     # draw battery components in buffer
     DrawBatterySlot()
     DrawBattery(batteryPercentage)
     DrawBatteryPercentage(batteryPercentage)
-    # display all components in buffer
+    DrawBatteryCharging(batteryCharging)
+    # display all components in buffer on screen
     epd.display(epd.buffer)
-    # put screen into sleep mode for 180s
+    # put screen into sleep mode for 10min
     epd.sleep()
-    time.sleep(180)
+    time.sleep(600)
     epd.init()
     # clean the screen
     screenRefreshTime += 1
