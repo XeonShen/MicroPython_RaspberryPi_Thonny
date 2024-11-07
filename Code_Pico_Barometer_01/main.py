@@ -628,7 +628,7 @@ temperatureConversionFactor = 3.3 / 65535
 def GetTemperature():
     temperatureInVoltage = temperatureInput.read_u16() * temperatureConversionFactor
     temperature = 27 - (temperatureInVoltage - 0.706) / 0.001721
-    return round(temperature, 1)
+    return round(temperature)
     
 ########################################################      
 ################ timer setter and getter ###############
@@ -887,6 +887,9 @@ def DrawBatteryCharging(status):
         epd.vline(176, 12, 5, 0x00)
         epd.fill_rect(176, 11, 4, 2, 0x00)
         epd.fill_rect(176, 16, 4, 2, 0x00)
+        
+def DrawTemperature(number):
+    epd.text("Temp:" + str(number) + "`C", 10, 11, 0x00)
 
 ###################################################    
 ################ program main logic ###############
@@ -902,28 +905,29 @@ SetTime(0,0,0)
 screenRefreshTime = 0
 
 while True:
-    # get current time
+    # get current time & draw time components in buffer
     currentHour, currentMinute = GetTime()
     currentHourFirstNum = currentHour // 10
     currentHourSecondNum = currentHour % 10
     currentMinuteFirstNum = currentMinute //10
-    currentMinuteSecondNum = currentMinute % 10
-    # draw time components in buffer
+    currentMinuteSecondNum = currentMinute % 10 
     DrawNumberSlot()
     DrawNumber(currentHourFirstNum,currentHourSecondNum,currentMinuteFirstNum,currentMinuteSecondNum)
-    # get battery status
+    # get battery status & draw battery components in buffer
     batteryPercentage = GetBatteryPercentage()
     batteryCharging = GetBatteryChargingStatus()
-    # draw battery components in buffer
     DrawBatterySlot()
     DrawBattery(batteryPercentage)
     DrawBatteryPercentage(batteryPercentage)
     DrawBatteryCharging(batteryCharging)
+    # get current temperature & draw temperature components in buffer
+    currentTemperature = GetTemperature()
+    DrawTemperature(currentTemperature)
     # display all components in buffer on screen
     epd.display(epd.buffer)
     # put screen into sleep mode for 10min
     epd.sleep()
-    time.sleep(600)
+    time.sleep(599)
     epd.init()
     # clean the screen
     screenRefreshTime += 1
