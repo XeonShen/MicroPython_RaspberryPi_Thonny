@@ -1,5 +1,6 @@
 from machine import ADC, Pin, SPI
 import framebuf
+import math
 import time
 import utime
 
@@ -851,11 +852,41 @@ def DrawBattery(number):
         epd.fill_rect(219, 10, 5, 8, 0x00)
     
 def DrawBatteryPercentage(number):
-    epd.text(str(number) + "%", 185, 11, 0x00)
+    if number == 100:
+        epd.text(str(number) + "%", 185, 11, 0x00)
+    elif number >= 10 and number < 100:
+        epd.text(" " + str(number) + "%", 185, 11, 0x00)
+    else:
+        epd.text("  " + str(number) + "%", 185, 11, 0x00)
     
 def DrawBatteryCharging(status):
     if status:
-        epd.text("Charging", 94, 11, 0x00)
+        # draw a circle
+        x = 174
+        y = 14
+        radius = 3
+        verticalOffset = 0
+        decision_over_2 = 1 - radius
+        while verticalOffset <= radius:
+            epd.pixel(x + radius, y + verticalOffset, 0x00)
+            epd.pixel(x + verticalOffset, y + radius, 0x00)
+            epd.pixel(x - radius, y + verticalOffset, 0x00)
+            epd.pixel(x - verticalOffset, y + radius, 0x00)
+            epd.pixel(x - radius, y - verticalOffset, 0x00)
+            epd.pixel(x - verticalOffset, y - radius, 0x00)
+            epd.pixel(x + radius, y - verticalOffset, 0x00)
+            epd.pixel(x + verticalOffset, y - radius, 0x00)
+            verticalOffset += 1
+            if decision_over_2 <= 0:
+                decision_over_2 += 2 * verticalOffset + 1
+            else:
+                radius -= 1
+                decision_over_2 += 2 * (verticalOffset - radius) + 1
+        # draw several lines
+        epd.hline(166, 14, 6, 0x00)
+        epd.vline(176, 12, 5, 0x00)
+        epd.fill_rect(176, 11, 4, 2, 0x00)
+        epd.fill_rect(176, 16, 4, 2, 0x00)
 
 ###################################################    
 ################ program main logic ###############
@@ -866,7 +897,7 @@ epd = EPD_2in13_V3_Landscape()
 epd.Clear()
 epd.fill(0xff)
 # set start time
-SetTime(16,26,0)
+SetTime(0,0,0)
 # count screen refresh time
 screenRefreshTime = 0
 
