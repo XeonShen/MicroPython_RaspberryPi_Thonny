@@ -1,4 +1,4 @@
-from machine import ADC, Pin, SPI
+from machine import ADC, Pin, SPI, deepsleep
 import framebuf
 import math
 import time
@@ -783,6 +783,7 @@ def DrawNumberZeroInSlot(slot):
     epd.fill_rect(50 + xOffset, 26, 10, 80, 0x00)
     
 def DrawNumber(firstNum, secondNum, thirdNum, forthNum):
+    # enumerate each condition in each slot
     firstSlot = {
         1: lambda: DrawNumberOneInSlot(1),
         2: lambda: DrawNumberTwoInSlot(1),
@@ -831,6 +832,8 @@ def DrawNumber(firstNum, secondNum, thirdNum, forthNum):
         9: lambda: DrawNumberNineInSlot(4),
         0: lambda: DrawNumberZeroInSlot(4),
     }
+    
+    # draw number in each slot
     draw = firstSlot.get(firstNum)
     draw() if draw else print("Invalid Number")
     draw = secondSlot.get(secondNum)
@@ -898,6 +901,7 @@ def DrawBatteryCharging(status):
             else:
                 radius -= 1
                 decision_over_2 += 2 * (verticalOffset - radius) + 1
+                
         # draw several lines
         epd.hline(166, 14, 6, 0x00)
         epd.vline(176, 12, 5, 0x00)
@@ -915,9 +919,11 @@ def DrawTemperature(number):
 epd = EPD_2in13_V3_Landscape()
 epd.Clear()
 epd.fill(0xff)
+
 # set start time
 SetTime(0,0,0)
 SetWeekday(0)
+
 # count screen refresh time
 screenRefreshTime = 0
 
@@ -928,10 +934,11 @@ while True:
     currentHourSecondNum = currentHour % 10
     currentMinuteFirstNum = currentMinute //10
     currentMinuteSecondNum = currentMinute % 10
-    UpdateWeekday()
     DrawNumberSlot()
     DrawNumber(currentHourFirstNum,currentHourSecondNum,currentMinuteFirstNum,currentMinuteSecondNum)
+    UpdateWeekday()
     DrawWeekday(GetWeekday())
+    
     # get battery status & draw battery components in buffer
     batteryPercentage = GetBatteryPercentage()
     batteryCharging = GetBatteryChargingStatus()
@@ -939,16 +946,28 @@ while True:
     DrawBattery(batteryPercentage)
     DrawBatteryPercentage(batteryPercentage)
     DrawBatteryCharging(batteryCharging)
+    
     # get current temperature & draw temperature components in buffer
     currentTemperature = GetTemperature()
     DrawTemperature(currentTemperature)
+    
     # display all components in buffer on screen
     epd.display(epd.buffer)
+    
     # put screen into sleep mode for 10min
     epd.sleep()
-    time.sleep(598)
+    time.sleep(599)
     epd.init()
+    
     # clean the screen
     screenRefreshTime += 1
     epd.Clear() if screenRefreshTime % 20 == 0 else None
     epd.fill(0xff)
+    
+    # stop working if battery low
+    if batteryPercentage <= 10:
+        epd.sleep()
+        break
+
+# enter deepsleep mode
+deepsleep()
