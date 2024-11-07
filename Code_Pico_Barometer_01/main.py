@@ -161,11 +161,9 @@ class EPD_2in13_V3_Portrait(framebuf.FrameBuffer):
     parameter:
     '''
     def ReadBusy(self):
-        print('busy')
         self.delay_ms(10)
         while(self.digital_read(self.busy_pin) == 1):      # 0: idle, 1: busy
             self.delay_ms(10)    
-        print('busy release')
     
     '''
     function : Turn On Display
@@ -253,7 +251,6 @@ class EPD_2in13_V3_Portrait(framebuf.FrameBuffer):
     parameter:
     '''
     def init(self):
-        print('init')
         self.reset()
         self.delay_ms(100)
         
@@ -434,11 +431,9 @@ class EPD_2in13_V3_Landscape(framebuf.FrameBuffer):
         self.digital_write(self.cs_pin, 1)
 
     def ReadBusy(self):
-        print('busy')
         self.delay_ms(10)
         while(self.digital_read(self.busy_pin) == 1):      # 0: idle, 1: busy
             self.delay_ms(10)    
-        print('busy release')
 
     def TurnOnDisplay(self):
         self.send_command(0x22)  # Display Update Control
@@ -490,7 +485,6 @@ class EPD_2in13_V3_Landscape(framebuf.FrameBuffer):
         self.send_data((Ystart >> 8) & 0xFF)
 
     def init(self):
-        print('init')
         self.reset()
         self.delay_ms(100)
         
@@ -650,8 +644,27 @@ def GetTime():
     totalSeconds = initialHour * 3600 + initialMinute * 60 + initialSecond + int(elapsedSeconds)
     currentHours = (totalSeconds // 3600) % 24
     currentMinutes = (totalSeconds % 3600) // 60
-    #currentSeconds = totalSeconds % 60
     return currentHours, currentMinutes
+
+systemUpDays = 0
+weekday = 0
+weekdays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+
+def SetWeekday(number):
+    global weekday
+    weekday = number
+    
+def GetWeekday():
+    return weekdays[weekday]
+
+def UpdateWeekday():
+    global systemUpDays, weekday
+    elapsedSeconds = time.time() - initialTimeStamp
+    totalSeconds = initialHour * 3600 + initialMinute * 60 + initialSecond + int(elapsedSeconds)
+    elapsedDays = (totalSeconds // 3600) // 24
+    if elapsedDays > systemUpDays:
+        weekday = (weekday + (elapsedDays - systemUpDays)) % 7
+        systemUpDays = elapsedDays
 
 ##########################################################      
 ################ draw components in buffer ###############
@@ -827,6 +840,9 @@ def DrawNumber(firstNum, secondNum, thirdNum, forthNum):
     draw = forthSlot.get(forthNum)
     draw() if draw else print("Invalid Number")
     
+def DrawWeekday(day):
+    epd.text(str(day), 114, 11, 0x00)
+    
 def DrawBatterySlot():
     epd.rect(219, 10, 5, 8, 0x00)
     epd.rect(224, 10, 5, 8, 0x00)
@@ -901,6 +917,7 @@ epd.Clear()
 epd.fill(0xff)
 # set start time
 SetTime(0,0,0)
+SetWeekday(0)
 # count screen refresh time
 screenRefreshTime = 0
 
@@ -910,9 +927,11 @@ while True:
     currentHourFirstNum = currentHour // 10
     currentHourSecondNum = currentHour % 10
     currentMinuteFirstNum = currentMinute //10
-    currentMinuteSecondNum = currentMinute % 10 
+    currentMinuteSecondNum = currentMinute % 10
+    UpdateWeekday()
     DrawNumberSlot()
     DrawNumber(currentHourFirstNum,currentHourSecondNum,currentMinuteFirstNum,currentMinuteSecondNum)
+    DrawWeekday(GetWeekday())
     # get battery status & draw battery components in buffer
     batteryPercentage = GetBatteryPercentage()
     batteryCharging = GetBatteryChargingStatus()
@@ -927,7 +946,7 @@ while True:
     epd.display(epd.buffer)
     # put screen into sleep mode for 10min
     epd.sleep()
-    time.sleep(599)
+    time.sleep(598)
     epd.init()
     # clean the screen
     screenRefreshTime += 1
